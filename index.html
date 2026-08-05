@@ -940,6 +940,12 @@
   document.querySelectorAll('.shots figure img, .shot-single img').forEach(function(im){
     im.addEventListener('click', function(){ openLb(im.currentSrc || im.src, im.alt); });
   });
+  /* 案内図（チャージ機・待機列）はスマホ幅のみタップで拡大 */
+  document.querySelectorAll('img.figimg, img.flatimg').forEach(function(im){
+    im.addEventListener('click', function(){
+      if(window.matchMedia('(max-width:680px)').matches){ openLb(im.currentSrc || im.src, im.alt); }
+    });
+  });
   lb.addEventListener('click', closeLb);
   document.getElementById('lb-close').addEventListener('click', closeLb);
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLb(); });
@@ -962,18 +968,23 @@
 </script>
 <script>(function(){if(location.hash==='#cashless'){var pa=document.querySelector('.payall');if(pa)pa.open=true;}})();</script>
 <style>
-#totop{position:fixed;right:16px;bottom:16px;z-index:120;width:48px;height:48px;border-radius:50%;background:#042242;border:none;box-shadow:0 4px 14px rgba(4,34,66,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-#totop.show{opacity:1;pointer-events:auto}
-#totop svg{width:22px;height:22px;stroke:#FFEA00;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
-#totop:hover{background:#0a3a72}
-@media print{#totop{display:none}}
+#totop{position:fixed; right:14px; bottom:16px; z-index:120; display:none;
+  align-items:center; justify-content:center; width:46px; height:46px; border-radius:8px;
+  background:rgba(255,255,255,.72); border:1px solid rgba(4,34,66,.16); color:#042242;
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  box-shadow:0 2px 8px rgba(4,34,66,.12); cursor:pointer; padding:0}
+#totop.show{display:flex}
+#totop svg{width:22px; height:22px; fill:currentColor; display:block}
+@media print{#totop{display:none!important}}
+@media(max-width:680px){.figimg,.flatimg{cursor:zoom-in}}
 </style>
-<button id="totop" aria-label="ページの先頭へ戻る"><svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></button>
+<button id="totop" aria-label="ページ上部へ戻る"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.6" width="14" height="2.2" rx="1.1"/><path d="M12 8.2 5.6 15h4v5.4h4.8V15h4z"/></svg></button>
 <script>(function(){
-var b=document.getElementById('totop');
-function chk(){var y=window.pageYOffset||document.documentElement.scrollTop;b.classList.toggle('show',y>600);}
-window.addEventListener('scroll',chk,{passive:true});chk();
-b.addEventListener('click',function(){try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){window.scrollTo(0,0);}});
+var fab=document.getElementById('totop');
+if(!fab)return;
+function upd(){fab.classList.toggle('show', window.scrollY > window.innerHeight);}
+addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
+fab.addEventListener('click',function(ev){ev.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
 })();</script>
 </body>
 </html>
