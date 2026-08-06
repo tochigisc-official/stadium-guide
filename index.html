@@ -1000,5 +1000,31 @@ function upd(){fab.classList.toggle('show', window.scrollY > window.innerHeight)
 addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
 fab.addEventListener('click',function(ev){ev.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
 })();</script>
+<script>(function(){
+/* 「試合ページ」リンクの自動切替：
+   今日以降で最初のホームゲームのLPへ。未公開(404)なら次候補→それも無ければ直近の過去試合へ。
+   日程が変わったら下のDATES（試合日8桁=LPフォルダ名）を直すだけ。 */
+var BASE='https://tochigisc-official.github.io/homegame_lp/';
+var DATES=['20260809','20260822','20260902','20260905','20260926','20261011','20261021','20261031','20261103','20261115','20261129','20261213','20270221','20270306','20270307','20270317','20270328','20270411','20270425','20270504','20270516'];
+var links=[];
+var hd=document.getElementById('lp-link');
+if(hd)links.push({el:hd,suffix:''});
+document.querySelectorAll('a.alink[href*="homegame_lp"]').forEach(function(a){
+  var m=a.getAttribute('href').match(/homegame_lp\/\d{8}\/(.*)$/);
+  links.push({el:a,suffix:m?m[1]:''});
+});
+function setAll(d){links.forEach(function(l){l.el.href=BASE+d+'/'+l.suffix;});}
+var t=new Date();
+var today=''+t.getFullYear()+('0'+(t.getMonth()+1)).slice(-2)+('0'+t.getDate()).slice(-2);
+var future=DATES.filter(function(d){return d>=today;}).sort();
+var past=DATES.filter(function(d){return d<today;}).sort().reverse();
+var cand=future.concat(past);
+(function tryNext(i){
+  if(i>=cand.length)return;
+  fetch(BASE+cand[i]+'/',{method:'HEAD'}).then(function(r){
+    if(r.ok){setAll(cand[i]);}else{tryNext(i+1);}
+  }).catch(function(){/* ローカル閲覧などfetch不可時はHTMLの初期リンクのまま */});
+})(0);
+})();</script>
 </body>
 </html>
